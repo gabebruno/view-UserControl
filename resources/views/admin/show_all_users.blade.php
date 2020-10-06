@@ -1,6 +1,15 @@
 @extends('home')
 
 @section('frame1')
+    @if (session('status'))
+        <div class="alert alert-success">
+            {{ session('status') }}
+        </div>
+    @elseif (session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
     <div class="row">
         <div class="col-12">
             <div class="card">
@@ -30,6 +39,7 @@
                                         @endif
                                     </td>
                                     <td>
+                                        @method('DELETE')
                                         <p>
                                             <a href="{{ route('edit', $user->id) }}" class="btn btn-warning"><i class="fas fa-edit"></i></a>
                                             <a href="{{ route('delete', $user->id) }}" class="btn btn-danger"><i class="fas fa-trash"></i></a>

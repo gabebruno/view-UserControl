@@ -18,13 +18,14 @@ class LoginController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function login()
     {
-
-        $email = $this->request->input('email');
-        $password = $this->request->input('password');
+        $data = array(
+            'password' => $this->request->input('password'),
+            'email' => $this->request->input('email')
+        );
 
         $api = 'http://usercontrolgabebruno.herokuapp.com/api/auth/login';
 
@@ -39,8 +40,7 @@ class LoginController extends Controller
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => array(
-                'password' => $password,'email' => $email),
+            CURLOPT_POSTFIELDS => $data,
         ));
 
         $response = json_decode(curl_exec($curl));
@@ -49,42 +49,17 @@ class LoginController extends Controller
         if (isset($response->access_token))
         {
             Storage::disk('local')->put('id_token', $response->access_token);
-            $user = $this->get_user();
+
+            $api = 'http://usercontrolgabebruno.herokuapp.com/api/user/me';
+            $user = $this->getCurl($api);
             Session::put('user', $user);
-            return view('home', [$user]);
+
+            return redirect()->route('home', ['user' => $user]);
         }
-        else{
-            return view('login/unauthorized');
+        else
+        {
+            return redirect()->route('login')->withErrors("Email or password wrong, try again!");
         }
-
-
-    }
-
-    public function get_user()
-    {
-        $api = 'http://usercontrolgabebruno.herokuapp.com/api/user/me';
-        $token = Storage::get('id_token');
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $api,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer ".$token
-            ),
-        ));
-
-        $response = json_decode(curl_exec($curl));
-        curl_close($curl);
-
-        return $response;
     }
 
     public function logout()
@@ -92,7 +67,7 @@ class LoginController extends Controller
         Session::remove('user');
         Storage::delete('id_token');
 
-        return view('login/logout');
+        return redirect()->route('login')->withErrors("You've been disconnected.");
     }
 
 }

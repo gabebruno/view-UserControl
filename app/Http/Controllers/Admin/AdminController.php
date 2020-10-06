@@ -20,30 +20,11 @@ class AdminController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function show_All_Users()
+    public function showAllUsers()
     {
         $api = 'http://usercontrolgabebruno.herokuapp.com/api/user';
 
-        $token = Storage::get('id_token');
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $api,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer ".$token
-            ),
-        ));
-
-        $response = json_decode(curl_exec($curl));
-        curl_close($curl);
+        $response = $this->getCurl($api);
 
         return view('admin/show_all_users', [
            'users' => $response
@@ -53,53 +34,65 @@ class AdminController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function new_User()
+    public function store(Request $request)
     {
-        //
+        $api = 'https://usercontrolgabebruno.herokuapp.com/api/user/store';
+
+        $form = $request->all();
+        $data = array(
+            'name' => $form['name'],
+            'address' => $form['address'],
+            'cpf' => $form['cpf'],
+            'email' => $form['email'],
+            'permission' => $form['permission'],
+            'phone' => $form['phone'],
+            'password' => bcrypt($form['password']),
+        );
+
+        $response = $this->postCurl($api, $data, "POST");
+
+        if ($response)
+        {
+            return redirect()->route('all_users')->with('status', 'Congrats! You created a new user.');
+        }
+        else
+        {
+            return redirect()->route('all_users')->with('error', 'Sorry, something happens and your request don\'t be done!');
+        }
     }
 
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return bool
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request)
     {
-        $data = $request->all();
-        //$data = $this->clean_register(json_decode($result));
+        $form = $request->all();
+        $data = array(
+            'id' => $form['id'],
+            'name' => $form['name'],
+            'address' => $form['address'],
+            'cpf' => $form['cpf'],
+            'email' => $form['email'],
+            'permission' => $form['permission'],
+            'phone' => $form['phone'],
+        );
 
         $api = 'https://usercontrolgabebruno.herokuapp.com/api/user/update/'.$data['id'];
 
-        $token = Storage::get('id_token');
-        
-        $curl = curl_init();
+        $result = $this->postCurl($api, $data, 'PUT');
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $api,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "PUT",
-            CURLOPT_POSTFIELDS => $data,
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer ".$token,
-                "Content-Type: application/json"
-            ),
-        ));
-
-        $response = curl_exec($curl);
-
-        curl_close($curl);
-
-        dd($response);
-        return $response;
-
+        if ($result) {
+            return redirect()->route('all_users')->with('status', 'Yeh! User updated successfully!');
+        }
+        else
+        {
+            return redirect()->route('all_users')->with('error', 'Sorry, something happens and your request don\'t be done!');
+        }
     }
 
     /**
@@ -108,34 +101,13 @@ class AdminController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function edit_User($id)
+    public function edit($id)
     {
-        //recebe o id, traz os dados do usuario e chama a tela de edição
-
         $api = 'http://usercontrolgabebruno.herokuapp.com/api/user/'.$id;
 
-        $token = Storage::get('id_token');
+        $response = $this->getCurl($api);
 
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $api,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "GET",
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer ".$token
-            ),
-        ));
-
-        $response = json_decode(curl_exec($curl));
-        curl_close($curl);
-
-        $response = $this->clean_register($response);
+        $response = $this->cleanRegister($response);
 
         return view('admin/update_user', [
             'user' => $response
@@ -147,22 +119,20 @@ class AdminController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function delete_User($id)
+    public function destroy($id)
     {
-        //
-    }
+        $api = 'https://usercontrolgabebruno.herokuapp.com/api/user/delete/'.$id;
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show_User($id)
-    {
-        //
+        if($this->postCurl($api, array(), 'DELETE'))
+        {
+            return redirect()->route('all_users')->with('status', 'The target has been destroyed!');
+        }
+        else
+        {
+            return redirect()->route('all_users')->with('error', "Sorry, something happens and your request don't be done!");
+        }
     }
 
     /**
@@ -170,14 +140,17 @@ class AdminController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function show_Logs(Request $request, $id)
+    public function showLogs(Request $request, $id)
     {
-        //
+        $api = 'http://usercontrolgabebruno.herokuapp.com/api/logs';
+        $response = $this->getCurl($api);
+
+        return redirect()->route('logs', ['logs' => $response]);
     }
 
-    public function clean_register($data)
+    public function cleanRegister($data)
     {
         return [
             'id' => $data->id,

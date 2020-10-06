@@ -21,6 +21,13 @@
         <div class="card">
             <div class="card-body login-card-body">
                 <p class="login-box-msg">Logar para acessar o sistema</p>
+
+                @if($errors->any())
+                    <div class="callout callout-info">
+                        <p>{!! implode('', $errors->all('<div>:message</div>')) !!}</p>
+                    </div>
+                @endif
+
                 <form action="{{ route('logged') }}" method="POST">
                     {{ csrf_field() }}
                     <div class="input-group mb-3">
