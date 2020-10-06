@@ -7,11 +7,19 @@
 @stop
 
 @section('content')
+
     <div class="row">
         <div class="col-10 offset-1">
             <div class="card">
                 <div class="card-body">
-                    @yield('frame1')
+                    @if($errors->any())
+                        <div class="callout callout-danger">
+                            <h4>Warning!</h4>
+                            <p>{!! implode('', $errors->all('<div>:message</div>')) !!}</p>
+                        </div>
+                    @else
+                        @yield('frame1')
+                    @endif
                 </div>
             </div>
         </div>

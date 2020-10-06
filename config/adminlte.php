@@ -237,7 +237,7 @@ return [
             'topnav' => false,
         ],
 
-        ['header' => 'account_settings'],
+        ['header' => 'MY ACCOUNT'],
         [
             'text' => 'profile',
             'route'  => 'my_profile',

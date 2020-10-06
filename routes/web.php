@@ -27,31 +27,7 @@ Route::post('/unauthorized', function() {
     return view('/login/unauthorized');
 })->name('unauthorized');
 
-Route::namespace('Admin')->group(function ()
-{
-    Route::get('logs', [AdminController::class, 'show_Logs'])
-        ->name('logs');
-
-    Route::get('users', [AdminController::class, 'show_All_Users'])
-        ->name('all_users');
-
-    Route::post('user/store', [AdminController::class, 'new_User'])
-        ->name('new_user');
-
-    Route::put('user/update/{id}', [AdminController::class, 'update'])->where('id', '[0-9]+')
-        ->name('update');
-
-    Route::get('user/edit/{id}', [AdminController::class, 'edit_User'])->where('id', '[0-9]+')
-        ->name('edit');
-
-    Route::delete('user/delete/{id}', [AdminController::class, 'delete_User'])->where('id', '[0-9]+')
-        ->name('delete');
-
-    Route::get('user/{id}', [AdminController::class, 'show_User'])->where('id', '[0-9]+')
-        ->name('user_details');
-});
-
-Route::namespace('Client')->group(function()
+Route::middleware('auth')->group(function()
 {
     Route::get('/', function(){
         return view('home');
@@ -62,8 +38,32 @@ Route::namespace('Client')->group(function()
 
     Route::put('user/my/update', [UserController::class, 'update_My_Profile'])
         ->name('update_me');
+
+    Route::middleware('admin')->group(function ()
+    {
+        Route::get('logs', [AdminController::class, 'show_Logs'])
+            ->name('logs');
+
+        Route::get('users', [AdminController::class, 'show_All_Users'])
+            ->name('all_users');
+
+        Route::post('user/store', [AdminController::class, 'new_User'])
+            ->name('new_user');
+
+        Route::put('user/update/{id}', [AdminController::class, 'update'])->where('id', '[0-9]+')
+            ->name('update');
+
+        Route::get('user/edit/{id}', [AdminController::class, 'edit_User'])->where('id', '[0-9]+')
+            ->name('edit');
+
+        Route::delete('user/delete/{id}', [AdminController::class, 'delete_User'])->where('id', '[0-9]+')
+            ->name('delete');
+
+        Route::get('user/{id}', [AdminController::class, 'show_User'])->where('id', '[0-9]+')
+            ->name('user_details');
+    });
 });
 
-Route::get('auth/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 
