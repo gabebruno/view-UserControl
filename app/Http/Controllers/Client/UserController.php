@@ -50,7 +50,7 @@ class UserController extends Controller
      */
     public function update(Request $request)
     {
-        $api = "https://usercontrolgabebruno.herokuapp.com/api/user/update";
+        $api = "user/update";
 
         $form = $request->all();
 

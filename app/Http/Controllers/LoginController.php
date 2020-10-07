@@ -27,15 +27,15 @@ class LoginController extends Controller
             'email' => $this->request->input('email')
         );
 
-        $api = 'http://usercontrolgabebruno.herokuapp.com/api/auth/login';
+        $api = 'auth/login';
 
-        $response = json_decode($this->postCurl($api, $data, 'POST'));
+        $response = json_decode($this->postCurl($api, $data, 'LOGIN'));
 
         if (isset($response->access_token))
         {
             Storage::disk('local')->put('id_token', $response->access_token);
 
-            $api = 'http://usercontrolgabebruno.herokuapp.com/api/user/me';
+            $api = 'user/me';
             $user = $this->getCurl($api);
 
             Session::put('user', $user);

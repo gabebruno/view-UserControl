@@ -12,16 +12,21 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-
-
     public function getCurl($api)
     {
+        $url = 'https://usercontrolgabebruno.herokuapp.com/api';
+        $url_local = 'localhost:8001/api';
+
+        $url = $url.'/'.$api;
+        $url_local = $url_local.'/'.$api;
+
+
         $token = Storage::get('id_token');
 
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $api,
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => array(
                 "Authorization: Bearer ".$token
@@ -36,29 +41,44 @@ class Controller extends BaseController
 
     public function postCurl($api, $data, $method)
     {
-        $token = Storage::get('id_token');
+        $url = 'https://usercontrolgabebruno.herokuapp.com/api';
+        $url_local = 'localhost:8001/api';
 
-        if(isset($data->id)) {
+        $url = $url.'/'.$api;
+        $url_local = $url_local.'/'.$api;
+
+        $method != 'LOGIN'  ?  $token = Storage::get('id_token') : $method = 'POST';
+
+        if(isset($data->id) || $data == null) {
             $header = array(
-                'Authorization: Bearer' . $token,
-                'Content-Type: application/json'
+                'Authorization: Bearer '.$token,
+                'Content-Type: application/json',
+                'Accept: application/json'
             );
         }
-        $curl = curl_init();
+        else
+            $header = array('Content-Type: application/json');
 
+        $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $api,
+            CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
             CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $data,
+            CURLOPT_POSTFIELDS => json_encode($data),
+            CURLOPT_HTTPHEADER => $header,
+
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+
         ));
 
-        if (isset($header))
-            curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+        $method == 'POST' ? curl_setopt($curl, CURLOPT_POST, true) : null;
+        $method == 'POST' ? curl_setopt($curl, CURLOPT_PUT, true) : null;
 
         $response = curl_exec($curl);
-
         curl_close($curl);
 
         return $response;

@@ -22,7 +22,7 @@ class AdminController extends Controller
      */
     public function showAllUsers()
     {
-        $api = 'http://usercontrolgabebruno.herokuapp.com/api/user';
+        $api = 'user';
 
         $response = $this->getCurl($api);
 
@@ -38,18 +38,9 @@ class AdminController extends Controller
      */
     public function store(Request $request)
     {
-        $api = 'https://usercontrolgabebruno.herokuapp.com/api/user/store';
+        $api = 'user/store';
 
         $form = $request->all();
-//        $data = array(
-//            'name' => $form['name'],
-//            'address' => $form['address'],
-//            'cpf' => $form['cpf'],
-//            'email' => $form['email'],
-//            'permission' => $form['permission'],
-//            'phone' => $form['phone'],
-//            'password' => bcrypt($form['password']),
-//        );
 
         $data = $this->cleanData($form);
 
@@ -77,7 +68,7 @@ class AdminController extends Controller
 
         $data = $this->cleanData($form);
 
-        $api = 'https://usercontrolgabebruno.herokuapp.com/api/user/update/'.$data['id'];
+        $api = 'user/update/'.$data['id'];
 
         $result = $this->postCurl($api, $data, 'PUT');
 
@@ -98,7 +89,7 @@ class AdminController extends Controller
      */
     public function edit($id)
     {
-        $api = 'http://usercontrolgabebruno.herokuapp.com/api/user/'.$id;
+        $api = 'user/'.$id;
 
         $response = $this->getCurl($api);
 
@@ -118,7 +109,7 @@ class AdminController extends Controller
      */
     public function destroy($id)
     {
-        $api = 'https://usercontrolgabebruno.herokuapp.com/api/user/delete/'.$id;
+        $api = 'user/delete/'.$id;
 
         if($this->postCurl($api, array(), 'DELETE'))
         {
@@ -139,7 +130,7 @@ class AdminController extends Controller
      */
     public function showLogs()
     {
-        $api = 'http://usercontrolgabebruno.herokuapp.com/api/logs';
+        $api = 'logs';
         $response = $this->getCurl($api);
 
         return view('admin/logs', ['logs' => $response]);
