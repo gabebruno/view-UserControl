@@ -106,7 +106,7 @@ return [
     'classes_auth_body' => '',
     'classes_auth_footer' => '',
     'classes_auth_icon' => '',
-    'classes_auth_btn' => 'btn-flat btn-primary',
+    'classes_auth_btn' => 'btn-flat',
 
     /*
     |--------------------------------------------------------------------------
@@ -188,7 +188,7 @@ return [
 
     'use_route_url' => false,
 
-    'dashboard_url' => 'home',
+    'dashboard_url' => '',
 
     'logout_url' => 'logout',
 
@@ -231,11 +231,6 @@ return [
     */
 
     'menu' => [
-        [
-            'text' => 'search',
-            'search' => false,
-            'topnav' => false,
-        ],
 
         ['header' => 'MY ACCOUNT'],
         [
@@ -244,7 +239,7 @@ return [
             'icon' => 'fas fa-fw fa-user-tie',
         ],
         [
-            'text' => 'change_password',
+            'text' => 'Edit user',
             'route'  => 'update_me',
             'icon' => 'fas fa-fw fa-lock',
         ],

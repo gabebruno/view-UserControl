@@ -29,22 +29,7 @@ class LoginController extends Controller
 
         $api = 'http://usercontrolgabebruno.herokuapp.com/api/auth/login';
 
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $api,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => $data,
-        ));
-
-        $response = json_decode(curl_exec($curl));
-        curl_close($curl);
+        $response = json_decode($this->postCurl($api, $data, 'POST'));
 
         if (isset($response->access_token))
         {
@@ -52,6 +37,7 @@ class LoginController extends Controller
 
             $api = 'http://usercontrolgabebruno.herokuapp.com/api/user/me';
             $user = $this->getCurl($api);
+
             Session::put('user', $user);
 
             return redirect()->route('home', ['user' => $user]);

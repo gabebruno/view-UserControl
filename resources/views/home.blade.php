@@ -12,16 +12,17 @@
         <div class="col-10 offset-1">
             <div class="card">
                 <div class="card-body">
-                    @if($errors->any())
-                        <div class="callout callout-danger">
-                            <h4>Warning!</h4>
-                            <p>{!! implode('', $errors->all('<div>:message</div>')) !!}</p>
+                    @if (session('status'))
+                        <div class="alert alert-success">
+                            {{ session('status') }}
                         </div>
-                    @else
-                        @yield('frame1')
+                    @elseif (session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
                     @endif
+                    @yield('frame1')
                 </div>
             </div>
         </div>
-    @include('scripts')
 @stop

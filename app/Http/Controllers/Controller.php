@@ -38,22 +38,44 @@ class Controller extends BaseController
     {
         $token = Storage::get('id_token');
 
+        if(isset($data->id)) {
+            $header = array(
+                'Authorization: Bearer' . $token,
+                'Content-Type: application/json'
+            );
+        }
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
             CURLOPT_URL => $api,
-            CURLOPT_CUSTOMREQUEST => ($method),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => ($data),
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer ".$token,
-                "Content-Type: application/json"
-            ),
+            CURLOPT_POSTFIELDS => $data,
         ));
+
+        if (isset($header))
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
 
         $response = curl_exec($curl);
 
         curl_close($curl);
+
+        return $response;
+    }
+
+
+    public function cleanData($form)
+    {
+
+        $response['id'] = isset($form->id) ? $form->id : null;
+        $response['name'] = isset($form->name) ? $form->name : null;
+        $response['email'] = isset($form->email) ? $form->email : null;
+        $response['address'] = isset($form->address) ? $form->address : null;
+        $response['phone'] = isset($form->phone) ? $form->phone : null;
+        $response['cpf'] = isset($form->cpf) ? $form->cpf : null;
+        $response['permission'] = isset($form->permission) ? $form->permission : null;
+        $response['password'] = isset($form->password) ? $form->password : null;
 
         return $response;
     }

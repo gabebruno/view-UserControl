@@ -41,15 +41,17 @@ class AdminController extends Controller
         $api = 'https://usercontrolgabebruno.herokuapp.com/api/user/store';
 
         $form = $request->all();
-        $data = array(
-            'name' => $form['name'],
-            'address' => $form['address'],
-            'cpf' => $form['cpf'],
-            'email' => $form['email'],
-            'permission' => $form['permission'],
-            'phone' => $form['phone'],
-            'password' => bcrypt($form['password']),
-        );
+//        $data = array(
+//            'name' => $form['name'],
+//            'address' => $form['address'],
+//            'cpf' => $form['cpf'],
+//            'email' => $form['email'],
+//            'permission' => $form['permission'],
+//            'phone' => $form['phone'],
+//            'password' => bcrypt($form['password']),
+//        );
+
+        $data = $this->cleanData($form);
 
         $response = $this->postCurl($api, $data, "POST");
 
@@ -72,15 +74,8 @@ class AdminController extends Controller
     public function update(Request $request)
     {
         $form = $request->all();
-        $data = array(
-            'id' => $form['id'],
-            'name' => $form['name'],
-            'address' => $form['address'],
-            'cpf' => $form['cpf'],
-            'email' => $form['email'],
-            'permission' => $form['permission'],
-            'phone' => $form['phone'],
-        );
+
+        $data = $this->cleanData($form);
 
         $api = 'https://usercontrolgabebruno.herokuapp.com/api/user/update/'.$data['id'];
 
@@ -107,7 +102,7 @@ class AdminController extends Controller
 
         $response = $this->getCurl($api);
 
-        $response = $this->cleanRegister($response);
+        $response = $this->cleanData($response);
 
         return view('admin/update_user', [
             'user' => $response
@@ -140,26 +135,14 @@ class AdminController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function showLogs(Request $request, $id)
+    public function showLogs()
     {
         $api = 'http://usercontrolgabebruno.herokuapp.com/api/logs';
         $response = $this->getCurl($api);
 
-        return redirect()->route('logs', ['logs' => $response]);
+        return view('admin/logs', ['logs' => $response]);
     }
 
-    public function cleanRegister($data)
-    {
-        return [
-            'id' => $data->id,
-            'name' => $data->name,
-            'email' => $data->email,
-            'address' => $data->address,
-            'phone' => $data->phone,
-            'cpf' => $data->cpf,
-            'permission' => $data->permission,
-        ];
-    }
 }

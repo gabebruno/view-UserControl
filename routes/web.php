@@ -29,10 +29,13 @@ Route::middleware('auth')->group(function()
         return view('home');
     })->name('home');
 
-    Route::get('user/my', [UserController::class, 'showMyProfile'])
+    Route::get('user/me', [UserController::class, 'show'])
         ->name('my_profile');
 
-    Route::put('user/my/update', [UserController::class, 'updateMyProfile'])
+    Route::get('user/me/update', [UserController::class, 'edit'])
+        ->name('update_me');
+
+    Route::put('user/me/update', [UserController::class, 'update'])
         ->name('update_me');
 
     Route::middleware('admin')->group(function ()
@@ -44,7 +47,7 @@ Route::middleware('auth')->group(function()
             ->name('all_users');
 
         Route::get('user/create', function() {
-            return view('admin/new_user');
+            return view('admin.new_user');
         })->name('new_user');
 
         Route::post('user/create', [AdminController::class, 'store'])
