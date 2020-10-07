@@ -53,11 +53,13 @@ class UserController extends Controller
         $api = "user/update";
 
         $form = $request->all();
-
+        $form['password'] = $form['password'] != null ?  bcrypt($form['password']) : null;
         $response = $this->postCurl($api, $form, 'PUT');
 
         if($response)
+        {
             return redirect()->route('home')->with('status', 'Your profile is updated!');
+        }
         else
             return redirect()->route('home')->with('error', 'I\'m so sorry, i don\'t know what happens. Try again later, please!');
     }

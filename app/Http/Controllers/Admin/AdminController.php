@@ -42,9 +42,7 @@ class AdminController extends Controller
 
         $form = $request->all();
 
-        $data = $this->cleanData($form);
-
-        $response = $this->postCurl($api, $data, "POST");
+        $response = $this->postCurl($api, $form, "POST");
 
         if ($response)
         {
@@ -66,11 +64,12 @@ class AdminController extends Controller
     {
         $form = $request->all();
 
-        $data = $this->cleanData($form);
+        if(isset($form['password']))
+            bcrypt($form['password']);
 
-        $api = 'user/update/'.$data['id'];
-
-        $result = $this->postCurl($api, $data, 'PUT');
+        $api = 'user/update/'.$form['id'];
+        
+        $result = $this->postCurl($api, $form, 'PUT');
 
         if ($result) {
             return redirect()->route('all_users')->with('status', 'Yeh! User updated successfully!');

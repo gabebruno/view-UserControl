@@ -9,6 +9,7 @@
             @method('put')
             {{ csrf_field() }}
             <input type="hidden" name="id" id="id" value="{{$user->id}}">
+            <input type="hidden" name="permission" id="permission" value="{{$user->permission}}">
             <div class="box-body">
                 <div class="form-group">
                     <label for="name" class="col-sm-2 control-label">Name</label>
