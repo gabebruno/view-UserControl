@@ -43,7 +43,7 @@ Here are the technologies used in this project.
  
 ## Links
  
-  - Link of deployed API: Soon...
+  - Link of deployed API: http://view-usercontrol.herokuapp.com/login
   - Repository: https://github.com/gabebruno/view-UserControl 
  
 ## Versioning
